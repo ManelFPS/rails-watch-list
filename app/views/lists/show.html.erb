@@ -1,0 +1,38 @@
+<div class="container my-4">
+  <%= link_to "← All lists", lists_path %>
+  <h1 class="my-3"><%= @list.name %></h1>
+  <%= simple_form_for [@list, @bookmark] do |f| %>
+    <%= f.association :movie,
+          collection: Movie.order(:title),
+          label_method: :title,
+          value_method: :id,
+          prompt: "Choose a movie" %>
+    <%= f.input :comment %>
+    <%= f.button :submit, "Add to list", class: "btn btn-primary" %>
+  <% end %>
+
+  <% if @list.bookmarks.empty? %>
+    <p class="text-muted">Nothing here yet. Add your first movie!</p>
+  <% else %>
+    <div class="row">
+      <% @list.bookmarks.includes(:movie).each do |bookmark| %>
+        <div class="col-12 col-md-6 mb-3">
+          <div class="card h-100">
+            <% if bookmark.movie.poster_url.present? %>
+              <%= image_tag bookmark.movie.poster_url, class: "card-img-top", alt: bookmark.movie.title %>
+            <% end %>
+            <div class="card-body">
+              <h5 class="card-title"><%= bookmark.movie.title %></h5>
+              <h6 class="card-subtitle mb-2 text-muted">Rating: <%= bookmark.movie.rating %></h6>
+              <p class="card-text"><%= bookmark.movie.overview %></p>
+              <p class="fst-italic">"<%= bookmark.comment %>"</p>
+              <%= link_to "Remove", bookmark_path(bookmark),
+                    class: "btn btn-sm btn-outline-danger",
+                    data: { turbo_method: :delete, turbo_confirm: "Remove this movie from the list?" } %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
