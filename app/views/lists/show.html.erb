@@ -35,4 +35,29 @@
       <% end %>
     </div>
   <% end %>
+  <h2 class="mt-5 mb-3">Reviews</h2>
+
+  <%= simple_form_for [@list, @review] do |f| %>
+    <%= f.input :content, as: :text, label: "Your review" %>
+    <%= f.input :rating, collection: 0..5, prompt: "Choose a rating" %>
+    <%= f.button :submit, "Post review", class: "btn btn-primary" %>
+  <% end %>
+
+  <div class="mt-4">
+    <% if @list.reviews.empty? %>
+      <p class="text-muted">No reviews yet. Be the first!</p>
+    <% else %>
+      <% @list.reviews.order(created_at: :desc).each do |review| %>
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="text-warning">
+              <%= "★" * review.rating %><%= "☆" * (5 - review.rating) %>
+            </div>
+            <p class="card-text my-2"><%= review.content %></p>
+            <small class="text-muted"><%= time_ago_in_words(review.created_at) %> ago</small>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
 </div>
